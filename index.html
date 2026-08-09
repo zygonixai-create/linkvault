@@ -27,7 +27,7 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      animation: fadeOut 0.5s ease-in-out forwards 1s;
+      transition: opacity 0.5s ease;
     }
 
     .spinner {
@@ -48,7 +48,6 @@
     }
 
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
     /* CONTAINER & HEADER */
     .container { max-width: 500px; width: 100%; }
@@ -135,11 +134,16 @@
       margin-bottom: 16px;
     }
 
-    /* 2-COLUMN PRODUCT GRID */
+    /* 2-COLUMN PRODUCT GRID & ANIMATIONS */
     .product-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+    }
+
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .product-card {
@@ -150,6 +154,13 @@
       flex-direction: column;
       justify-content: space-between;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      animation: cardFadeIn 0.4s ease-out forwards;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
     }
 
     .product-img {
@@ -182,6 +193,7 @@
       border-radius: 8px;
       font-size: 12px;
       text-align: center;
+      transition: background-color 0.2s ease;
     }
 
     .btn-buy:hover { background-color: #511aa7; }
@@ -234,56 +246,23 @@
   </div>
 
   <script>
-    // ALL YOUR PRODUCTS ARE ADDED BELOW
+    // Hide Loader on Page Load
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loader');
+      loader.style.opacity = '0';
+      setTimeout(() => loader.style.display = 'none', 500);
+    });
+
+    // ALL PRODUCTS (Replace image values with your local image names after uploading to GitHub, e.g., '1.jpg')
     const products = [
-      {
-        id: "1",
-        title: "Titan Edge Watch",
-        image: "https://m.media-amazon.com/images/I/71YyN4R33TL._AC_UL600_.jpg",
-        link: "https://amzn.to/4xz5YvL"
-      },
-      {
-        id: "2",
-        title: "Dragon Kids Wear",
-        image: "https://m.media-amazon.com/images/I/61N+E2qK9JL._AC_UL600_.jpg",
-        link: "https://amzn.to/4uwPbqz"
-      },
-      {
-        id: "3",
-        title: "Dragon Ride Toy",
-        image: "https://m.media-amazon.com/images/I/71uK9g8H9nL._AC_UL600_.jpg",
-        link: "https://amzn.to/4eCvms3"
-      },
-      {
-        id: "4",
-        title: "Instant Tea Premix",
-        image: "https://m.media-amazon.com/images/I/71TknC22-AL._AC_UL600_.jpg",
-        link: "https://amzn.to/4eb0H4y"
-      },
-      {
-        id: "5",
-        title: "Bella Vita Brightening Soap",
-        image: "https://m.media-amazon.com/images/I/61H+aY+N-6L._AC_UL600_.jpg",
-        link: "https://amzn.to/4exRHXJ"
-      },
-      {
-        id: "6",
-        title: "Magic Cleaning Soap",
-        image: "https://m.media-amazon.com/images/I/61Ff11xG0SL._AC_UL600_.jpg",
-        link: "https://amzn.to/4f1s1EK"
-      },
-      {
-        id: "7",
-        title: "Frido Comfort Sliders",
-        image: "https://m.media-amazon.com/images/I/51f9I010MML._AC_UL600_.jpg",
-        link: "https://amzn.to/43tnhjT"
-      },
-      {
-        id: "8",
-        title: "OnePlus Nord Buds",
-        image: "https://m.media-amazon.com/images/I/51oMWaW7tKL._AC_UL600_.jpg",
-        link: "https://link.amazon/B07Htp19L"
-      }
+      { id: "1", title: "Titan Edge Watch", image: "1.jpg", link: "https://amzn.to/4xz5YvL" },
+      { id: "2", title: "Dragon Kids Wear", image: "2.jpg", link: "https://amzn.to/4uwPbqz" },
+      { id: "3", title: "Dragon Ride Toy", image: "3.jpg", link: "https://amzn.to/4eCvms3" },
+      { id: "4", title: "Instant Tea Premix", image: "4.jpg", link: "https://amzn.to/4eb0H4y" },
+      { id: "5", title: "Bella Vita Brightening Soap", image: "5.jpg", link: "https://amzn.to/4exRHXJ" },
+      { id: "6", title: "Magic Cleaning Soap", image: "6.jpg", link: "https://amzn.to/4f1s1EK" },
+      { id: "7", title: "Frido Comfort Sliders", image: "7.jpg", link: "https://amzn.to/43tnhjT" },
+      { id: "8", title: "OnePlus Nord Buds", image: "8.jpg", link: "https://link.amazon/B07Htp19L" }
     ];
 
     // RENDER PRODUCTS
@@ -306,7 +285,7 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-          <img class="product-img" src="${product.image}" alt="${product.title}">
+          <img class="product-img" src="${product.image}" alt="${product.title}" onerror="this.src='https://via.placeholder.com/300?text=Image+Not+Found'">
           <div class="product-title">#${product.id} ${product.title}</div>
           <a href="${product.link}" target="_blank" rel="nofollow sponsored" class="btn-buy">
             Buy on Amazon
