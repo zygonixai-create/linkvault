@@ -21,33 +21,34 @@
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background-color: #f3effe;
+      background: linear-gradient(135deg, #f3effe 0%, #efe4ff 100%);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      transition: opacity 0.5s ease;
-    }
-
-    .spinner {
-      width: 45px;
-      height: 45px;
-      border: 4px solid #e0d5fa;
-      border-top: 4px solid #6c35c4;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 12px;
+      animation: fadeOut 0.6s ease-in-out forwards 2.4s;
     }
 
     .loader-text {
-      font-weight: 600;
+      font-weight: 900;
       color: #6c35c4;
-      letter-spacing: 1px;
-      font-size: 14px;
+      letter-spacing: 0.18em;
+      font-size: clamp(46px, 10vw, 82px);
+      text-transform: uppercase;
+      opacity: 0;
+      transform: scale(0.7) translateY(24px);
+      animation: popIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards 0.1s;
+      text-shadow: 0 10px 30px rgba(108, 53, 196, 0.18);
     }
 
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.7) translateY(24px); }
+      60% { opacity: 1; transform: scale(1.05) translateY(-6px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
     /* CONTAINER & HEADER */
     .container { max-width: 500px; width: 100%; }
@@ -134,16 +135,11 @@
       margin-bottom: 16px;
     }
 
-    /* 2-COLUMN PRODUCT GRID & ANIMATIONS */
+    /* 2-COLUMN PRODUCT GRID */
     .product-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-    }
-
-    @keyframes cardFadeIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .product-card {
@@ -154,13 +150,7 @@
       flex-direction: column;
       justify-content: space-between;
       box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-      animation: cardFadeIn 0.4s ease-out forwards;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .product-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
 
     .product-img {
@@ -169,6 +159,9 @@
       object-fit: contain;
       border-radius: 10px;
       margin-bottom: 8px;
+      background: #f7f3ff;
+      border: 1px solid #efe4ff;
+      display: block;
     }
 
     .product-title {
@@ -178,6 +171,7 @@
       margin-bottom: 10px;
       line-height: 1.3;
       display: -webkit-box;
+      line-clamp: 2;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
@@ -193,7 +187,6 @@
       border-radius: 8px;
       font-size: 12px;
       text-align: center;
-      transition: background-color 0.2s ease;
     }
 
     .btn-buy:hover { background-color: #511aa7; }
@@ -212,8 +205,7 @@
 
   <!-- LOADING ANIMATION OVERLAY -->
   <div id="loader">
-    <div class="spinner"></div>
-    <div class="loader-text">LINK VAULT</div>
+    <div class="loader-text">Link Vault</div>
   </div>
 
   <div class="container">
@@ -246,23 +238,83 @@
   </div>
 
   <script>
-    // Hide Loader on Page Load
-    window.addEventListener('load', () => {
-      const loader = document.getElementById('loader');
-      loader.style.opacity = '0';
-      setTimeout(() => loader.style.display = 'none', 500);
-    });
+    const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Crect width='400' height='400' fill='%23f5efff'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='28' fill='%236323c2'%3EProduct Image%3C/text%3E%3C/svg%3E";
 
-    // ALL PRODUCTS (Replace image values with your local image names after uploading to GitHub, e.g., '1.jpg')
+    function createProductImage(title, id) {
+      const safeTitle = title
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+          <defs>
+            <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7a3ee8" />
+              <stop offset="100%" stop-color="#b58bff" />
+            </linearGradient>
+          </defs>
+          <rect width="400" height="400" rx="28" fill="url(#g)" />
+          <circle cx="320" cy="90" r="64" fill="rgba(255,255,255,0.16)" />
+          <rect x="44" y="44" width="312" height="312" rx="24" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+          <text x="200" y="188" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="white">${safeTitle}</text>
+          <text x="200" y="236" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.85)">#${id}</text>
+        </svg>
+      `;
+
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    // ALL YOUR PRODUCTS ARE ADDED BELOW
     const products = [
-      { id: "1", title: "Titan Edge Watch", image: "1.jpg", link: "https://amzn.to/4xz5YvL" },
-      { id: "2", title: "Dragon Kids Wear", image: "2.jpg", link: "https://amzn.to/4uwPbqz" },
-      { id: "3", title: "Dragon Ride Toy", image: "3.jpg", link: "https://amzn.to/4eCvms3" },
-      { id: "4", title: "Instant Tea Premix", image: "4.jpg", link: "https://amzn.to/4eb0H4y" },
-      { id: "5", title: "Bella Vita Brightening Soap", image: "5.jpg", link: "https://amzn.to/4exRHXJ" },
-      { id: "6", title: "Magic Cleaning Soap", image: "6.jpg", link: "https://amzn.to/4f1s1EK" },
-      { id: "7", title: "Frido Comfort Sliders", image: "7.jpg", link: "https://amzn.to/43tnhjT" },
-      { id: "8", title: "OnePlus Nord Buds", image: "8.jpg", link: "https://link.amazon/B07Htp19L" }
+      {
+        id: "1",
+        title: "Titan Edge Watch",
+        image: createProductImage("Titan Edge Watch", "1"),
+        link: "https://amzn.to/4xz5YvL"
+      },
+      {
+        id: "2",
+        title: "Dragon Kids Wear",
+        image: createProductImage("Dragon Kids Wear", "2"),
+        link: "https://amzn.to/4uwPbqz"
+      },
+      {
+        id: "3",
+        title: "Dragon Ride Toy",
+        image: createProductImage("Dragon Ride Toy", "3"),
+        link: "https://amzn.to/4eCvms3"
+      },
+      {
+        id: "4",
+        title: "Instant Tea Premix",
+        image: createProductImage("Instant Tea Premix", "4"),
+        link: "https://amzn.to/4eb0H4y"
+      },
+      {
+        id: "5",
+        title: "Bella Vita Brightening Soap",
+        image: createProductImage("Bella Vita Brightening Soap", "5"),
+        link: "https://amzn.to/4exRHXJ"
+      },
+      {
+        id: "6",
+        title: "Magic Cleaning Soap",
+        image: createProductImage("Magic Cleaning Soap", "6"),
+        link: "https://amzn.to/4f1s1EK"
+      },
+      {
+        id: "7",
+        title: "Frido Comfort Sliders",
+        image: createProductImage("Frido Comfort Sliders", "7"),
+        link: "https://amzn.to/43tnhjT"
+      },
+      {
+        id: "8",
+        title: "OnePlus Nord Buds",
+        image: createProductImage("OnePlus Nord Buds", "8"),
+        link: "https://link.amazon/B07Htp19L"
+      }
     ];
 
     // RENDER PRODUCTS
@@ -285,7 +337,7 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-          <img class="product-img" src="${product.image}" alt="${product.title}" onerror="this.src='https://via.placeholder.com/300?text=Image+Not+Found'">
+          <img class="product-img" src="${product.image}" alt="${product.title}" loading="lazy" onerror="this.onerror=null;this.src='${fallbackImage}'">
           <div class="product-title">#${product.id} ${product.title}</div>
           <a href="${product.link}" target="_blank" rel="nofollow sponsored" class="btn-buy">
             Buy on Amazon
