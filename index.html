@@ -136,14 +136,17 @@
     }
 
     .upload-btn {
+      display: inline-block;
       border: 1px solid #d8c2ff;
-      background: #fff;
+      background: linear-gradient(135deg, #ffffff 0%, #f4ebff 100%);
       color: #6323c2;
-      padding: 8px 14px;
+      padding: 10px 16px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
+      box-shadow: 0 3px 8px rgba(99, 35, 194, 0.12);
+      text-align: center;
     }
 
     .upload-btn:hover {
@@ -380,7 +383,10 @@
       uploadNote.textContent = `Applied ${imageFiles.length} image${imageFiles.length > 1 ? 's' : ''} to the product cards.`;
     }
 
-    uploadBtn.addEventListener('click', () => imageUpload.click());
+    uploadBtn.addEventListener('click', () => {
+      imageUpload.click();
+    });
+
     imageUpload.addEventListener('change', async (event) => {
       await applyUploadedImages(event.target.files);
       event.target.value = '';
